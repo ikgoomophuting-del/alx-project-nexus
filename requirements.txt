@@ -1,0 +1,28 @@
+# Core Framework
+Django==5.0.6
+djangorestframework==3.15.2
+
+# Authentication (JWT)
+djangorestframework-simplejwt==5.3.1
+
+# Database (PostgreSQL)
+psycopg2-binary==2.9.9
+
+# API Documentation
+drf-yasg==1.21.8
+
+# Environment Management
+python-dotenv==1.0.1
+
+# CORS (for frontend integration)
+django-cors-headers==4.4.0
+
+# Production Tools
+gunicorn==22.0.0
+whitenoise==6.6.0
+
+# Optional (for deployment on Render/Heroku)
+dj-database-url==2.2.0
+
+# Developer Tools
+black==24.4.2
