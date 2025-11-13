@@ -1,104 +1,194 @@
-#  ALX Project Nexus – ProDev Backend Engineering Learnings
+Project Nexus: E-Commerce Backend (ProDev BE) 
 
-Welcome to **Project Nexus**, a documentation hub showcasing my major learnings, challenges, and insights from the **ProDev Backend Engineering Program**.  
-This repository consolidates the key backend engineering concepts, tools, and best practices I’ve acquired, serving as both a **personal reference** and a **collaboration resource** for fellow learners.
+## Introduction
+Project Nexus is a real-world e-commerce backend system built as part of the ProDev Backend Engineering program.
+It simulates a production-grade development environment emphasizing scalability, security, and performance.
 
----
+The backend handles:
 
-##  Project Objective
+Product and category management
 
-The objective of this project is to:
+User authentication and authorization (JWT)
 
-- 🧩 Consolidate key learnings from the **ProDev Backend Engineering** program.  
-- 📘 Document backend technologies, concepts, challenges, and implemented solutions.  
-- 🔍 Serve as a **reference guide** for current and future learners.  
-- 🤝 Foster **collaboration** between frontend and backend learners to encourage teamwork and shared growth.
+Efficient product filtering, sorting, and pagination
 
----
+Comprehensive API documentation for easy frontend integration
 
-##  Key Technologies Covered
+## Project Goals
+CRUD APIs – Build and manage endpoints for products, categories, and users.
 
-The ProDev Backend Engineering program provided deep exposure to essential backend technologies and frameworks, including:
+Filtering, Sorting & Pagination – Ensure fast, flexible product discovery.
 
-- **Python** – Core language for backend development.  
-- **Django & Django REST Framework (DRF)** – For building robust RESTful APIs.  
-- **GraphQL** – For flexible, schema-driven API design.  
-- **Docker** – For containerization and reproducible environments.  
-- **CI/CD Pipelines** – Using Jenkins/GitHub Actions for automated integration and deployment.  
-- **Celery & RabbitMQ** – For asynchronous background task management.  
+Database Optimization – Apply indexing and schema best practices for performance.
 
----
+API Documentation – Generate live documentation via Swagger/OpenAPI.
 
-##  Core Backend Concepts
+## Technologies Used
+Technology	Purpose
+Django REST Framework (DRF)	Backend API framework
+PostgreSQL	Relational database for product and user data
+JWT (JSON Web Tokens)	Secure authentication and session management
+drf-yasg / drf-spectacular	API documentation and schema generation
+Swagger / Postman	API testing and visualization
+Git & GitHub	Version control and collaboration
 
-Throughout the program, I gained strong practical and theoretical understanding in:
+### Features
 
-- **Database Design & Optimization** – Crafting normalized relational models using PostgreSQL and optimizing queries.  
-- **Asynchronous Programming** – Managing concurrency efficiently with async/await and Celery tasks.  
-- **Caching Strategies** – Improving performance with Redis and Django cache frameworks.  
-- **System Design** – Structuring scalable and fault-tolerant backend architectures.  
-- **Security & Authentication** – Implementing JWT-based authentication and securing endpoints.  
+## User Authentication
+User registration and login via JWT.
 
----
+Secure endpoints accessible only to authenticated users.
 
-##  Challenges & Solutions
+Token-based session management.
 
-| Challenge | Solution Implemented |
-|------------|----------------------|
-| Managing heavy background tasks | Integrated **Celery with RabbitMQ** for asynchronous task queues. |
-| API response delays | Implemented **caching (Redis)** and **query optimization**. |
-| CI/CD setup complexity | Created a **Jenkins pipeline** to automate builds and deployments. |
-| Frontend-backend data integration | Developed **well-documented REST/GraphQL APIs** for seamless collaboration. |
+## Product & Category Management
+Full CRUD (Create, Read, Update, Delete) operations.
 
----
+Product model includes name, description, price, 7category, and stock quantity. 
 
-##  Best Practices & Personal Takeaways
+Categories can be created and assigned to multiple products.
 
-- **Write clean, modular, and reusable code.**  
-- **Document APIs** using Swagger or Postman Collections.  
-- **Automate repetitive tasks** (testing, deployment, linting).  
-- **Collaborate early and often** with frontend developers.  
-- **Use version control effectively** — commit often, write descriptive messages, and use feature branches.  
-- **Adopt CI/CD workflows** for reliability and consistency.  
+## Filtering, Sorting & Pagination
+Filter products by category:
+GET /api/products/?category=electronics
 
----
+Sort products by price or name:
+GET /api/products/?ordering=price or ?ordering=-price
 
-##  Collaboration – Key for Success
+Paginate large datasets:
+GET /api/products/?page=2&page_size=10
 
-### Collaborate With:
-- **Fellow ProDev Frontend Learners:**  
-  Exchange ideas, organize study sessions, and integrate backend APIs with frontend projects.  
-- **ProDev Backend Learners:**  
-  Discuss solutions, debug issues together, and improve code quality through peer review.
+## API Documentation
+Automatically generated Swagger UI at /swagger/ or /api/docs/
 
-### Collaboration Platform:
-💬 **Dedicated Discord Channel:** `#ProDevProjectNexus`  
-Use this space to:
-- Share ideas and progress  
-- Ask or answer technical questions  
-- Stay updated with ProDev announcements  
+Shows all endpoints, request/response examples, and authentication headers.
 
-### 💡 ProDev Tip:
-- During **Week 1**, communicate my project idea.  
-- Identify **frontend learners** working on the same project to ensure seamless integration.  
+## Database Optimization
+PostgreSQL indexes added on key fields (price, category_id, name) to enhance performance.
 
----
+Optimized queries using select_related and prefetch_related.
 
-## 📁 Repository Setup
-
-**Repository Name:** `alx-project-nexus`
-
-**Structure:**
-alx-project-nexus/
+🗂️ Project Structure
+ecommerce_backend/
 │
-├── README.md # Main documentation file
-├── docs/ # (Optional) Additional notes, diagrams, or research
-└── examples/ # (Optional) Code snippets or practice exercises
+├── ecommerce/                # Main project settings
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+│
+├── products/                 # Product and category app
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   ├── urls.py
+│
+├── users/                    # Authentication app
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   ├── urls.py
+│
+├── requirements.txt
+├── README.md
+└── manage.py
 
-Edit or expand the documentation as yoI progress through the program.
+## Getting Started (Local Setup)
+1. Clone the Repository
+git clone https://github.com/<your-username>/ecommerce-backend.git
+cd ecommerce-backend
 
-🧠 Author
+2. Create and Activate Virtual Environment
+python -m venv venv
+source venv/bin/activate      # For Linux/Mac
+venv\Scripts\activate         # For Windows
 
-Name: Ikgopoleng Mophuting.
-Program: ProDev Backend Engineering
-GitHub: https://github.com/ikgoomophuting-del
+3. Install Dependencies
+pip install -r requirements.txt
+
+4. Configure Environment Variables
+Create a .env file in the project root with:
+
+SECRET_KEY=your_secret_key
+DEBUG=True
+DATABASE_NAME=ecommerce_db
+DATABASE_USER=postgres
+DATABASE_PASSWORD=yourpassword
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+
+5. Apply Migrations
+python manage.py makemigrations
+python manage.py migrate
+
+6. Create Superuser
+python manage.py createsuperuser
+
+7. Run the Server
+python manage.py runserver
+Access the project at:
+http://127.0.0.1:8000
+
+## API Endpoints Overview
+Authentication
+Method	Endpoint	Description
+POST	/api/auth/register/	Register new user
+POST	/api/auth/login/	Obtain JWT access token
+POST	/api/auth/logout/	Logout user (optional)
+Products
+Method	Endpoint	Description
+GET	/api/products/	List all products (supports filtering, sorting, pagination)
+POST	/api/products/	Create a new product
+GET	/api/products/{id}/	Retrieve a specific product
+PUT	/api/products/{id}/	Update a product
+DELETE	/api/products/{id}/	Delete a product
+Categories
+Method	Endpoint	Description
+GET	/api/categories/	List all categories
+POST	/api/categories/	Create a category
+PUT	/api/categories/{id}/	Update a category
+DELETE	/api/categories/{id}/	Delete a category
+
+## Database Optimization
+Indexes created on frequently queried fields:
+
+class Meta:
+    indexes = [
+        models.Index(fields=['price']),
+        models.Index(fields=['name']),
+    ]
+Efficient queryset usage:
+
+queryset = Product.objects.select_related('category').all()
+
+## API Documentation
+Interactive API documentation generated via Swagger:
+
+Swagger UI:
+http://127.0.0.1:8000/swagger/
+
+ReDoc:
+http://127.0.0.1:8000/redoc/
+
+Includes:
+
+All available endpoints
+
+Request/response models
+
+Example payloads
+
+Authentication details
+
+
+## Testing the API
+Use Postman or cURL to test endpoints:
+
+Example:
+
+curl -X GET http://127.0.0.1:8000/api/products/ \
+     -H "Authorization: Bearer <your_jwt_token>"
+
+ ## Author
+Ikgopoleng Mophuting
+Backend Developer — Project Nexus (ProDev BE)
+ [Your Email or GitHub Profile Lin]
