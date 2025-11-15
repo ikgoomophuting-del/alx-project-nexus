@@ -38,6 +38,22 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
+MIDDLEWARE = [
+    # Security / Core
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    
+    # Common Django Middleware
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # 🔥 (Day 6) Custom Middleware will be added here:
+    # 'core.middleware.RequestLoggingMiddleware',
+]
+
 ROOT_URLCONF = 'ecommerce.urls'
 
 WSGI_APPLICATION = 'ecommerce.wsgi.application'
