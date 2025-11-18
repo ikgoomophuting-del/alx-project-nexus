@@ -21,4 +21,7 @@ urlpatterns = [
 
     # Swagger
     path('docs/', schema_view.with_ui('swagger', cache_timeout=0)),
+
+    # Stripe
+    path('payments/', include('core.payment.urls')),
 ]
