@@ -28,3 +28,6 @@ class ProductListView(generics.ListAPIView):
 
     # Search
     search_fields = ["name", "description"]
+
+# Only admins can POST new products
+    permission_classes = [IsAdminOrReadOnly]
