@@ -26,3 +26,6 @@ dj-database-url==2.2.0
 
 # Developer Tools
 black==24.4.2
+
+# Strip Config
+stripe==8.6.0
