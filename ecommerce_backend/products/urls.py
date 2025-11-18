@@ -7,4 +7,7 @@ router = DefaultRouter()
 router.register("items", ProductViewSet, basename="products")
 router.register("categories", CategoryViewSet, basename="categories")
 
-urlpatterns = router.urls
+urlpatterns = [ router.urls
+                path("", ProductListView.as_view(), name="product-list"),
+
+]
