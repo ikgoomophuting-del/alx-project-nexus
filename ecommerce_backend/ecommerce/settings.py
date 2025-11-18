@@ -50,8 +50,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    # 🔥 (Day 6) Custom Middleware will be added here:
-    # 'core.middleware.RequestLoggingMiddleware',
+    # IP Tracking Middleware
+    'core.middleware.RequestLoggingMiddleware',
+    'core.middleware.IPTrackingMiddleware',
+]
+
 ]
 
 ROOT_URLCONF = 'ecommerce.urls'
