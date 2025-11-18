@@ -1,11 +1,18 @@
 import os
+import stripe
 from pathlib import Path
 from datetime import timedelta
-
-BASE_DIR = Path(__file__).resolve().parent.parent
+from decouple import config
 
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key")
 DEBUG = os.getenv("DEBUG", "True") == "True"
+STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY")
+STRIPE_PUBLISHABLE_KEY = config("STRIPE_PUBLISHABLE_KEY")
+STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET")
+
+stripe.api_key = STRIPE_SECRET_KEY
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 ALLOWED_HOSTS = ["*"]  # For Render deployment
 
@@ -61,6 +68,7 @@ MIDDLEWARE = [
 # -----------------------------------
 
 ROOT_URLCONF = "ecommerce.urls"
+DOMAIN_URL = config("DOMAIN_URL", default="http://localhost:8000")
 
 TEMPLATES = [
     {
