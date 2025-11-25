@@ -16,11 +16,13 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("api/accounts/", include("accounts.urls")),
     path('api/products/', include('products.urls')),
     path('api/users/', include('users.urls')),
+    path("api/core/", include("core.urls")),
 
     # Swagger
-    path('docs/', schema_view.with_ui('swagger', cache_timeout=0)),
+    path("docs/", schema_view.with_ui("swagger", cache_timeout=0), name="swagger-docs"),
 
     # Stripe
     path('payments/', include('core.payment.urls')),
