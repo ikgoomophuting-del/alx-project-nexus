@@ -4,8 +4,13 @@ from pathlib import Path
 from datetime import timedelta
 from decouple import config
 
+# -----------------------------------
+# BASE CONFIG
+# -----------------------------------
+
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key")
 DEBUG = os.getenv("DEBUG", "True") == "True"
+
 STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY")
 STRIPE_PUBLISHABLE_KEY = config("STRIPE_PUBLISHABLE_KEY")
 STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET")
@@ -22,7 +27,7 @@ ALLOWED_HOSTS = ["*"]  # For Render deployment
 # -----------------------------------
 
 INSTALLED_APPS = [
-    # Django default apps
+    # Django core apps
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -41,6 +46,7 @@ INSTALLED_APPS = [
     "core",
     "products",
     "users",
+    "accounts",  # ← added (Custom user, permissions, auth extras)
 ]
 
 
@@ -58,8 +64,11 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 
-    # Custom logging middleware 
-    "core.middleware.request_logging_middleware.RequestLoggingMiddleware",
+    # Custom logging middleware (corrected path)
+    "core.middleware.request_logging.RequestLoggingMiddleware",
+
+    # Role-based access middleware from accounts
+    "accounts.middleware.RoleRequiredMiddleware",
 ]
 
 
@@ -110,7 +119,7 @@ DATABASES = {
 # CUSTOM USER MODEL
 # -----------------------------------
 
-AUTH_USER_MODEL = "users.User"
+AUTH_USER_MODEL = "accounts.User"   # ← FIXED (your User is inside accounts app)
 
 
 # -----------------------------------
@@ -152,10 +161,13 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_FILTER_BACKENDS": (
-        "django_filters.rest_framework.DjangoFilterBackend",
-    ),
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend"
+    ],
+
+    # Global pagination
+    "DEFAULT_PAGINATION_CLASS": "core.pagination.CustomPagination",
     "PAGE_SIZE": 10,
 }
 
@@ -195,17 +207,41 @@ SWAGGER_SETTINGS = {
 
 
 # -----------------------------------
+# LOGGING CONFIG
+# -----------------------------------
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
+    },
+
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} → {message}",
+            "style": "{",
+        }
+    },
+
+    "loggers": {
+        "django": {"handlers": ["console"], "level": "INFO"},
+        "core.middleware.request_logging": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
+    },
+}
+
+
+# -----------------------------------
 # RENDER.COM DEPLOYMENT SETTINGS
 # -----------------------------------
 
-# Detect Render environment
 RENDER = os.environ.get("RENDER", None)
 
 if RENDER:
     DEBUG = False
-
-    # Force HTTPS on Render
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-
-    # Allow Render domains
     ALLOWED_HOSTS.append(os.environ.get("RENDER_EXTERNAL_HOSTNAME"))
