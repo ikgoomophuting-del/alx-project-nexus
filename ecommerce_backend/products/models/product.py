@@ -1,5 +1,6 @@
 from django.db import models
-from .category import Category
+from django.conf import settings
+from django.utils.text import slugify
 
 
 class Product(models.Model):
