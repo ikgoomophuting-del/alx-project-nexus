@@ -19,7 +19,7 @@ stripe.api_key = STRIPE_SECRET_KEY
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ALLOWED_HOSTS = ["*"]  # For Render deployment
+ALLOWED_HOSTS = ["your-app-name.onrender.com"]  # For Render deployment
 
 
 # -----------------------------------
@@ -63,6 +63,12 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    ...
+]
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
     # Custom logging middleware (corrected path)
     "core.middleware.request_logging.RequestLoggingMiddleware",
@@ -104,6 +110,10 @@ ASGI_APPLICATION = "ecommerce.asgi.application"
 # -----------------------------------
 
 DATABASES = {
+    import dj_database_url
+
+    'default': dj_database_url.config(default=os.environ.get("DATABASE_URL"))
+}
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "HOST": os.getenv("DB_HOST", "localhost"),
@@ -112,6 +122,7 @@ DATABASES = {
         "USER": os.getenv("DB_USER", "your_user"),
         "PASSWORD": os.getenv("DB_PASSWORD", "your_password"),
     }
+    
 }
 
 
@@ -245,3 +256,10 @@ if RENDER:
     DEBUG = False
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     ALLOWED_HOSTS.append(os.environ.get("RENDER_EXTERNAL_HOSTNAME"))
+
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
