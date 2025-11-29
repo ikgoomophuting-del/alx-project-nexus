@@ -3,23 +3,27 @@ import stripe
 from pathlib import Path
 from datetime import timedelta
 from decouple import config
+import dj_database_url
 
 # -----------------------------------
 # BASE CONFIG
 # -----------------------------------
 
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key")
-DEBUG = os.getenv("DEBUG", "True") == "True"
+SECRET_KEY = os.getenv("SECRET_KEY", config("SECRET_KEY", default="unsafe-dev-secret"))
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
-STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY")
-STRIPE_PUBLISHABLE_KEY = config("STRIPE_PUBLISHABLE_KEY")
-STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET")
+# Stripe keys (optional)
+STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY", default="")
+STRIPE_PUBLISHABLE_KEY = config("STRIPE_PUBLISHABLE_KEY", default="")
+STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET", default="")
 
-stripe.api_key = STRIPE_SECRET_KEY
+if STRIPE_SECRET_KEY:
+    stripe.api_key = STRIPE_SECRET_KEY
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ALLOWED_HOSTS = ["https://alx-project-nexus-3h8j.onrender.com"]  # For Render deployment
+# ALLOWED_HOSTS: don't include protocol (no http://)
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost").split(",")
 
 
 # -----------------------------------
@@ -27,7 +31,7 @@ ALLOWED_HOSTS = ["https://alx-project-nexus-3h8j.onrender.com"]  # For Render de
 # -----------------------------------
 
 INSTALLED_APPS = [
-    # Django core apps
+    # Django core
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -35,7 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # Third-party packages
+    # Third party
     "rest_framework",
     "rest_framework_simplejwt",
     "drf_yasg",
@@ -46,7 +50,7 @@ INSTALLED_APPS = [
     "core",
     "products",
     "users",
-    "accounts",  # ← added (Custom user, permissions, auth extras)
+    "accounts",
 ]
 
 
@@ -55,7 +59,9 @@ INSTALLED_APPS = [
 # -----------------------------------
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -63,18 +69,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 
-    # Custom middleware
+    # custom middleware
     "core.middleware.request_logging.RequestLoggingMiddleware",
-]
-    ...
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-
-    # Custom logging middleware (corrected path)
-    "core.middleware.request_logging.RequestLoggingMiddleware",
-
-    # Role-based access middleware from accounts
     "accounts.middleware.RoleRequiredMiddleware",
 ]
 
@@ -89,7 +85,7 @@ DOMAIN_URL = config("DOMAIN_URL", default="http://localhost:8000")
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -107,23 +103,11 @@ ASGI_APPLICATION = "ecommerce.asgi.application"
 
 
 # -----------------------------------
-# DATABASE CONFIG (PostgreSQL)
+# DATABASE (use DATABASE_URL in production)
 # -----------------------------------
 
 DATABASES = {
-    import dj_database_url
-
-    'default': dj_database_url.config(default=os.environ.get("DATABASE_URL"))
-}
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "HOST": os.getenv("DB_HOST", "localhost"),
-        "PORT": os.getenv("DB_PORT", "5432"),
-        "NAME": os.getenv("DB_NAME", "your_db"),
-        "USER": os.getenv("DB_USER", "your_user"),
-        "PASSWORD": os.getenv("DB_PASSWORD", "your_password"),
-    }
-    
+    "default": dj_database_url.config(default=os.environ.get("DATABASE_URL", f"sqlite:///{BASE_DIR/'db.sqlite3'}"))
 }
 
 
@@ -131,7 +115,7 @@ DATABASES = {
 # CUSTOM USER MODEL
 # -----------------------------------
 
-AUTH_USER_MODEL = "accounts.User"   # ← FIXED (your User is inside accounts app)
+AUTH_USER_MODEL = "accounts.User"
 
 
 # -----------------------------------
@@ -141,6 +125,8 @@ AUTH_USER_MODEL = "accounts.User"   # ← FIXED (your User is inside accounts ap
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 
@@ -149,7 +135,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # -----------------------------------
 
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = "UTC"
+TIME_ZONE = os.getenv("TIME_ZONE", "Africa/Johannesburg")
 USE_I18N = True
 USE_TZ = True
 
@@ -159,10 +145,11 @@ USE_TZ = True
 # -----------------------------------
 
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = BASE_DIR / "media"
 
 
 # -----------------------------------
@@ -173,14 +160,16 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-
-    "DEFAULT_FILTER_BACKENDS": [
-        "django_filters.rest_framework.DjangoFilterBackend"
-    ],
-
-    # Global pagination
-    "DEFAULT_PAGINATION_CLASS": "core.pagination.CustomPagination",
-    "PAGE_SIZE": 10,
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ),
+    "DEFAULT_FILTER_BACKENDS": (
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.OrderingFilter",
+        "rest_framework.filters.SearchFilter",
+    ),
+    "DEFAULT_PAGINATION_CLASS": "core.pagination.default_pagination.DefaultPagination",
+    "PAGE_SIZE": int(os.getenv("PAGE_SIZE", 12)),
 }
 
 
@@ -189,8 +178,8 @@ REST_FRAMEWORK = {
 # -----------------------------------
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=int(os.getenv("ACCESS_TOKEN_MINUTES", 60))),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=int(os.getenv("REFRESH_TOKEN_DAYS", 1))),
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
@@ -203,7 +192,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 
 # -----------------------------------
-# SWAGGER CONFIG
+# SWAGGER/DRF-YASG CONFIG
 # -----------------------------------
 
 SWAGGER_SETTINGS = {
@@ -212,7 +201,7 @@ SWAGGER_SETTINGS = {
         "Bearer": {
             "type": "apiKey",
             "name": "Authorization",
-            "in": "header"
+            "in": "header",
         }
     },
 }
@@ -225,24 +214,16 @@ SWAGGER_SETTINGS = {
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-
-    "handlers": {
-        "console": {"class": "logging.StreamHandler"},
-    },
-
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
     "formatters": {
         "verbose": {
             "format": "{levelname} {asctime} {module} → {message}",
             "style": "{",
         }
     },
-
     "loggers": {
         "django": {"handlers": ["console"], "level": "INFO"},
-        "core.middleware.request_logging": {
-            "handlers": ["console"],
-            "level": "INFO",
-        },
+        "core.middleware.request_logging": {"handlers": ["console"], "level": "INFO"},
     },
 }
 
@@ -256,11 +237,16 @@ RENDER = os.environ.get("RENDER", None)
 if RENDER:
     DEBUG = False
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-    ALLOWED_HOSTS.append(os.environ.get("RENDER_EXTERNAL_HOSTNAME"))
+    # Append Render external hostname if provided
+    render_host = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+    if render_host:
+        ALLOWED_HOSTS.append(render_host)
 
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
+# convenience: allow specifying ALLOWED_HOSTS via env var (comma separated)
+env_hosts = os.environ.get("ALLOWED_HOSTS")
+if env_hosts:
+    for h in env_hosts.split(","):
+        h = h.strip()
+        if h and h not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(h)
