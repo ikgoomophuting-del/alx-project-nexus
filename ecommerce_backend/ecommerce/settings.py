@@ -19,7 +19,7 @@ stripe.api_key = STRIPE_SECRET_KEY
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ALLOWED_HOSTS = ["your-app-name.onrender.com"]  # For Render deployment
+ALLOWED_HOSTS = ["https://alx-project-nexus-3h8j.onrender.com"]  # For Render deployment
 
 
 # -----------------------------------
