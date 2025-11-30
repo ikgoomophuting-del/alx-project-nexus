@@ -1,4 +1,5 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from users.permissions.roles_permission import IsAdminOrReadOnly
+
 
 
 class IsAdmin(BasePermission):
