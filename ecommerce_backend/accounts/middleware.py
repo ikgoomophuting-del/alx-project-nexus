@@ -1,14 +1,10 @@
-from django.http import JsonResponse
+from django.utils.deprecation import MiddlewareMixin
+from django.http import HttpResponseForbidden
 
-class RoleRequiredMiddleware:
+class RoleRequiredMiddleware(MiddlewareMixin):
     """
-    Optional middleware that checks if a request has a valid user role.
-    You can expand this logic later if needed.
+    Example placeholder — customize as needed.
     """
-
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        # Allow request to proceed
-        return self.get_response(request)
+    def process_request(self, request):
+        # example: skip for anonymous / static etc
+        return None
