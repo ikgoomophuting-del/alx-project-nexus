@@ -1,16 +1,14 @@
-from django.shortcuts import redirect
+from django.http import JsonResponse
 
-class RoleBasedRedirectMiddleware:
+class RoleRequiredMiddleware:
     """
-    Example middleware — adapt the mapping as needed.
-    If a user tries to access an admin-only path and isn't admin, redirect to home.
+    Optional middleware that checks if a request has a valid user role.
+    You can expand this logic later if needed.
     """
+
     def __init__(self, get_response):
         self.get_response = get_response
-    def __call__(self, request):
-        # only apply for authenticated users
-        path = request.path
-        if path.startswith("/admin/") and request.user.is_authenticated and not request.user.is_staff:
-            return redirect("/")
-        return self.get_response(request)
 
+    def __call__(self, request):
+        # Allow request to proceed
+        return self.get_response(request)
