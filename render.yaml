@@ -1,24 +1,19 @@
 services:
   - type: web
-    name: ecommerce-backend
+    name: alx-project-nexus
     env: python
-    plan: free
-    region: frankfurt
-    buildCommand: |
-      pip install --upgrade pip
-      pip install -r ecommerce_backend/requirements.txt
-    startCommand: |
-      cd ecommerce_backend &&
-      gunicorn ecommerce.wsgi:application --bind 0.0.0.0:$PORT
+    region: oregon
+    plan: starter
+
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn ecommerce_backend.ecommerce.wsgi:application"
+
     envVars:
       - key: PYTHON_VERSION
-        value: 3.13.0
+        value: 3.12.0
       - key: DJANGO_SETTINGS_MODULE
-        value: ecommerce.settings
+        value: ecommerce_backend.ecommerce.settings
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
         value: "False"
-      - key: ALLOWED_HOSTS
-        value: ".onrender.com"
-    autoDeploy: true
