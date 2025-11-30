@@ -71,7 +71,6 @@ MIDDLEWARE = [
 
     # custom middleware
     "core.middleware.request_logging.RequestLoggingMiddleware",
-    "accounts.middleware.RoleRequiredMiddleware",
 ]
 
 
