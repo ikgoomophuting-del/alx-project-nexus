@@ -168,8 +168,9 @@ REST_FRAMEWORK = {
         "rest_framework.filters.OrderingFilter",
         "rest_framework.filters.SearchFilter",
     ),
-    "DEFAULT_PAGINATION_CLASS": "core.pagination.default_pagination.DefaultPagination",
+    "DEFAULT_PAGINATION_CLASS": "products.pagination.product_pagination.ProductPagination",
     "PAGE_SIZE": int(os.getenv("PAGE_SIZE", 12)),
+
 }
 
 
