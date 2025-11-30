@@ -1,4 +1,4 @@
-from users.permissions.roles_permission import IsAdminOrReadOnly
+from users.permissions.roles_permissions import IsAdminOrReadOnly
 
 
 
