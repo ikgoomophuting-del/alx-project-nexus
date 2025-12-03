@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import Product, Category, Review
+from products.models.product import Product
+from products.models.category import Category
+from products.models.review import Review
 
 
 # -------------------- CATEGORY SERIALIZER --------------------
