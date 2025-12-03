@@ -5,7 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from users.permissions.roles_permissions import IsAdminOrReadOnly
 from products.models.product import Product
-from products.serializers.product_serializer import ProductSerializer
+from products.serializers.product_serializers import ProductSerializer
 from products.filters.product_filters import ProductFilter
 from products.pagination.product_pagination import ProductPagination
 
